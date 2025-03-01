@@ -3,7 +3,11 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, User, Hash, Home, LogIn } from 'lucide-react';
 
-const SideNavigation = () => {
+interface SideNavigationProps {
+  collapsed: boolean;
+}
+
+const SideNavigation: React.FC<SideNavigationProps> = ({ collapsed }) => {
   const location = useLocation();
   
   const navItems = [
@@ -14,10 +18,10 @@ const SideNavigation = () => {
   ];
 
   return (
-    <div className="fixed left-0 top-0 h-full w-16 sm:w-64 glass-panel z-10">
+    <div className={`fixed left-0 top-0 h-full glass-panel z-10 transition-all duration-300 ${collapsed ? 'w-16' : 'w-16 sm:w-64'}`}>
       <div className="flex flex-col h-full items-center sm:items-start gap-8 py-8">
         <div className="px-4 py-2 w-full">
-          <h2 className="text-xl font-bold hidden sm:block">ExoV1</h2>
+          <h2 className={`text-xl font-bold transition-opacity duration-300 ${collapsed ? 'hidden' : 'hidden sm:block'}`}>ExoV1</h2>
         </div>
         
         <nav className="flex flex-col gap-2 w-full px-3">
@@ -29,7 +33,9 @@ const SideNavigation = () => {
                 ${location.pathname === item.path ? 'bg-white/10' : 'hover:bg-white/5'}`}
             >
               <span className="text-white">{item.icon}</span>
-              <span className="text-white hidden sm:block">{item.label}</span>
+              <span className={`text-white transition-opacity duration-300 ${collapsed ? 'hidden' : 'hidden sm:block'}`}>
+                {item.label}
+              </span>
             </Link>
           ))}
         </nav>

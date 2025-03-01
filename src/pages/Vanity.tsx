@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import SearchBar from '../components/SearchBar';
 import VanityResult from '../components/VanityResult';
+import { handleVanityCheck } from '../api/discord-api-handler';
 
 const Vanity = () => {
   const [searchPerformed, setSearchPerformed] = useState(false);
@@ -9,32 +11,33 @@ const Vanity = () => {
   const [vanity, setVanity] = useState('');
   const [isAvailable, setIsAvailable] = useState(false);
   const [serverInfo, setServerInfo] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
+    // Clear previous results and errors
+    setError(null);
     setLoading(true);
     setVanity(query);
     
-    // Mock API call with timeout
-    setTimeout(() => {
-      // Randomly decide if the vanity is available (for demo purposes)
-      const available = Math.random() > 0.5;
-      
-      setIsAvailable(available);
-      
-      if (!available) {
-        // Mock server data
-        setServerInfo({
-          name: 'Demo Server',
-          icon: 'https://picsum.photos/200',
-          memberCount: Math.floor(Math.random() * 100000) + 1000,
-        });
-      } else {
-        setServerInfo(null);
+    try {
+      // Validate input as a potential vanity URL
+      if (!/^[a-zA-Z0-9-]{2,32}$/.test(query)) {
+        throw new Error('Invalid vanity code. Use 2-32 letters, numbers, or hyphens.');
       }
       
+      // Call API handler
+      const result = await handleVanityCheck(query, 'user-ip'); // In a real app, get the user's IP
+      
+      setIsAvailable(result.isAvailable);
+      setServerInfo(result.serverInfo);
       setSearchPerformed(true);
+    } catch (err) {
+      console.error('Vanity check error:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      toast.error(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -56,7 +59,14 @@ const Vanity = () => {
         </div>
       )}
       
-      {searchPerformed && !loading && (
+      {error && !loading && (
+        <div className="mt-10 panel p-6 text-center max-w-lg">
+          <h3 className="text-xl font-semibold mb-2 text-red-400">Error</h3>
+          <p className="text-gray-300">{error}</p>
+        </div>
+      )}
+      
+      {searchPerformed && !loading && !error && (
         <VanityResult
           vanity={vanity}
           isAvailable={isAvailable}
@@ -64,9 +74,10 @@ const Vanity = () => {
         />
       )}
       
-      {!searchPerformed && !loading && (
+      {!searchPerformed && !loading && !error && (
         <div className="mt-10 panel p-6 text-center max-w-lg">
           <p className="text-gray-300">Enter a vanity URL to check its availability for your Discord server.</p>
+          <p className="text-gray-400 text-sm mt-2">Example: discord</p>
         </div>
       )}
     </div>

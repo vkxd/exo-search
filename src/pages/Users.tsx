@@ -1,50 +1,51 @@
 
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import SearchBar from '../components/SearchBar';
 import UserPanel from '../components/UserPanel';
-
-// Mock badges
-const mockBadges = [
-  { id: '1', name: 'Discord Staff', icon: 'https://cdn.discordapp.com/emojis/314003252830011395.png' },
-  { id: '2', name: 'Verified Bot Developer', icon: 'https://cdn.discordapp.com/emojis/780794138227146812.png' },
-  { id: '3', name: 'Early Supporter', icon: 'https://cdn.discordapp.com/emojis/585828293445500936.png' },
-];
+import { handleUserSearch } from '../api/discord-api-handler';
 
 const Users = () => {
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
+    // Clear previous results and errors
+    setError(null);
     setLoading(true);
     
-    // Mock API call with timeout
-    setTimeout(() => {
-      // Mock user data - in a real app, this would come from an API
-      const mockUserData = {
-        username: query,
-        id: '123456789012345678',
-        avatar: 'https://i.pravatar.cc/300',
-        banner: 'https://picsum.photos/1000/300',
-        bio: 'This is a mock bio for demonstration purposes. In a real app, this would come from the Discord API.',
-        badges: mockBadges,
-      };
+    try {
+      // Validate input as a Discord user ID (snowflake)
+      if (!/^\d{17,20}$/.test(query)) {
+        throw new Error('Invalid Discord user ID. Please enter a valid ID (17-20 digits).');
+      }
       
-      setUserData(mockUserData);
+      // Call API handler
+      const result = await handleUserSearch(query, 'user-ip'); // In a real app, get the user's IP
+      
+      setUserData(result);
       setSearchPerformed(true);
+    } catch (err) {
+      console.error('Search error:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      toast.error(err instanceof Error ? err.message : 'An unknown error occurred');
+      setUserData(null);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
     <div className="flex flex-col items-center gap-8 w-full">
       <div className="w-full max-w-4xl mx-auto text-center mb-4">
         <h1 className="text-3xl font-bold mb-2 text-gradient">User Search</h1>
-        <p className="text-gray-300">Enter a Discord username or user ID to view their profile</p>
+        <p className="text-gray-300">Enter a Discord user ID to view their profile</p>
       </div>
       
       <SearchBar 
-        placeholder="Enter a user or user ID" 
+        placeholder="Enter a Discord user ID" 
         onSearch={handleSearch}
       />
       
@@ -55,20 +56,28 @@ const Users = () => {
         </div>
       )}
       
-      {searchPerformed && !loading && userData && (
-        <UserPanel user={userData} isSignedIn={false} />
-      )}
-      
-      {searchPerformed && !loading && !userData && (
-        <div className="mt-10 panel p-6 text-center">
-          <h3 className="text-xl font-semibold mb-2">User Not Found</h3>
-          <p className="text-gray-300">We couldn't find a user with that username or ID.</p>
+      {error && !loading && (
+        <div className="mt-10 panel p-6 text-center max-w-lg">
+          <h3 className="text-xl font-semibold mb-2 text-red-400">Error</h3>
+          <p className="text-gray-300">{error}</p>
         </div>
       )}
       
-      {!searchPerformed && !loading && (
+      {searchPerformed && !loading && userData && !error && (
+        <UserPanel user={userData} isSignedIn={false} />
+      )}
+      
+      {searchPerformed && !loading && !userData && !error && (
+        <div className="mt-10 panel p-6 text-center">
+          <h3 className="text-xl font-semibold mb-2">User Not Found</h3>
+          <p className="text-gray-300">We couldn't find a user with that ID.</p>
+        </div>
+      )}
+      
+      {!searchPerformed && !loading && !error && (
         <div className="mt-10 panel p-6 text-center max-w-lg">
-          <p className="text-gray-300">Enter a Discord username or user ID to view profile information, badges, and more.</p>
+          <p className="text-gray-300">Enter a Discord user ID to view profile information, badges, and more.</p>
+          <p className="text-gray-400 text-sm mt-2">Example ID: 350984980767670272</p>
         </div>
       )}
     </div>
