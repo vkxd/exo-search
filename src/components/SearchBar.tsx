@@ -5,9 +5,10 @@ import { Search } from 'lucide-react';
 interface SearchBarProps {
   placeholder: string;
   onSearch: (query: string) => void;
+  className?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ placeholder, onSearch }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ placeholder, onSearch, className = '' }) => {
   const [query, setQuery] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -18,14 +19,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ placeholder, onSearch }) => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className={`w-full max-w-2xl mx-auto ${className}`}>
       <form onSubmit={handleSubmit} className="relative">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
-          className="w-full py-3 px-12 rounded-full glass-panel text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300"
+          className="w-full py-3 px-12 rounded-full glass-panel text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300 hover:ring-1 hover:ring-white/10"
         />
         <button 
           type="submit" 

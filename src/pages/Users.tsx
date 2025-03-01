@@ -38,26 +38,27 @@ const Users = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full">
+    <div className="flex flex-col items-center gap-8 w-full animate-fade-in">
       <div className="w-full max-w-4xl mx-auto text-center mb-4">
-        <h1 className="text-3xl font-bold mb-2 text-gradient">User Search</h1>
+        <h1 className="text-4xl sm:text-5xl font-bold mb-2 text-white glow-text animate-pulse">User Search</h1>
         <p className="text-gray-300">Enter a Discord user ID to view their profile</p>
       </div>
       
       <SearchBar 
         placeholder="Enter a Discord user ID" 
         onSearch={handleSearch}
+        className="animate-scale-in"
       />
       
       {loading && (
-        <div className="mt-10 flex flex-col items-center">
+        <div className="mt-10 flex flex-col items-center animate-pulse">
           <div className="w-8 h-8 border-t-2 border-white rounded-full animate-spin mb-4"></div>
           <p className="text-gray-300">Searching for user...</p>
         </div>
       )}
       
       {error && !loading && (
-        <div className="mt-10 panel p-6 text-center max-w-lg">
+        <div className="mt-10 panel p-6 text-center max-w-lg animate-scale-in">
           <h3 className="text-xl font-semibold mb-2 text-red-400">Error</h3>
           <p className="text-gray-300">{error}</p>
         </div>
@@ -68,14 +69,14 @@ const Users = () => {
       )}
       
       {searchPerformed && !loading && !userData && !error && (
-        <div className="mt-10 panel p-6 text-center">
+        <div className="mt-10 panel p-6 text-center animate-scale-in">
           <h3 className="text-xl font-semibold mb-2">User Not Found</h3>
           <p className="text-gray-300">We couldn't find a user with that ID.</p>
         </div>
       )}
       
       {!searchPerformed && !loading && !error && (
-        <div className="mt-10 panel p-6 text-center max-w-lg">
+        <div className="mt-10 panel p-6 text-center max-w-lg animate-enter">
           <p className="text-gray-300">Enter a Discord user ID to view profile information, badges, and more.</p>
           <p className="text-gray-400 text-sm mt-2">Example ID: 350984980767670272</p>
         </div>

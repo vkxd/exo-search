@@ -35,7 +35,7 @@ export const getUserById = async (userId: string): Promise<any> => {
       id: response.data.id,
       avatar: response.data.avatar ? 
         `https://cdn.discordapp.com/avatars/${userId}/${response.data.avatar}.png?size=512` : 
-        null,
+        'https://cdn.discordapp.com/embed/avatars/0.png',
       banner: response.data.banner ? 
         `https://cdn.discordapp.com/banners/${userId}/${response.data.banner}.png?size=1024` : 
         null,
@@ -74,16 +74,16 @@ export const checkVanityUrl = async (vanityCode: string): Promise<any> => {
       }
     });
     
-    // Format server data
+    // Format server data if response exists
     const serverData = {
       isAvailable: false,
-      serverInfo: {
+      serverInfo: response.data.guild ? {
         name: response.data.guild.name,
         icon: response.data.guild.icon ? 
           `https://cdn.discordapp.com/icons/${response.data.guild.id}/${response.data.guild.icon}.png?size=256` : 
           null,
         memberCount: response.data.approximate_member_count || 0,
-      }
+      } : null
     };
     
     // Update cache

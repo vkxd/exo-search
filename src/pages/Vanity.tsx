@@ -41,26 +41,27 @@ const Vanity = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full">
+    <div className="flex flex-col items-center gap-8 w-full animate-fade-in">
       <div className="w-full max-w-4xl mx-auto text-center mb-4">
-        <h1 className="text-3xl font-bold mb-2 text-gradient">Vanity URL Checker</h1>
+        <h1 className="text-4xl sm:text-5xl font-bold mb-2 text-white glow-text animate-pulse">Vanity URL Checker</h1>
         <p className="text-gray-300">Check if a Discord vanity URL is available for your server</p>
       </div>
       
       <SearchBar 
         placeholder="Enter vanity here" 
         onSearch={handleSearch}
+        className="animate-scale-in"
       />
       
       {loading && (
-        <div className="mt-10 flex flex-col items-center">
+        <div className="mt-10 flex flex-col items-center animate-pulse">
           <div className="w-8 h-8 border-t-2 border-white rounded-full animate-spin mb-4"></div>
           <p className="text-gray-300">Checking vanity availability...</p>
         </div>
       )}
       
       {error && !loading && (
-        <div className="mt-10 panel p-6 text-center max-w-lg">
+        <div className="mt-10 panel p-6 text-center max-w-lg animate-scale-in">
           <h3 className="text-xl font-semibold mb-2 text-red-400">Error</h3>
           <p className="text-gray-300">{error}</p>
         </div>
@@ -75,7 +76,7 @@ const Vanity = () => {
       )}
       
       {!searchPerformed && !loading && !error && (
-        <div className="mt-10 panel p-6 text-center max-w-lg">
+        <div className="mt-10 panel p-6 text-center max-w-lg animate-enter">
           <p className="text-gray-300">Enter a vanity URL to check its availability for your Discord server.</p>
           <p className="text-gray-400 text-sm mt-2">Example: discord</p>
         </div>

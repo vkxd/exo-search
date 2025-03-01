@@ -123,6 +123,11 @@ export default {
             textShadow: "0 0 8px rgba(217, 70, 239, 0.7), 0 0 15px rgba(217, 70, 239, 0.5), 0 0 20px rgba(217, 70, 239, 0.3)" 
           },
         },
+        float: {
+          "0%": { transform: "translateY(0)", opacity: "0" },
+          "50%": { opacity: "1" },
+          "100%": { transform: "translateY(-100vh) scale(0.5)", opacity: "0" },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -138,6 +143,7 @@ export default {
         "pulse": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "glow": "glow 3s ease-in-out infinite",
         "highlight-glow": "highlight-glow 3s ease-in-out infinite",
+        "float": "float 20s linear infinite",
       },
       backdropBlur: {
         xs: '2px',
