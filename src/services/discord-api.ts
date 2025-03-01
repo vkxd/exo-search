@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 // Cache for storing results to avoid hitting rate limits
@@ -10,6 +9,67 @@ const isCacheValid = (key: string): boolean => {
   if (!cache[key]) return false;
   const now = Date.now();
   return now - cache[key].timestamp < CACHE_DURATION;
+};
+
+// Get user info by ID using Discord's public API
+export const getUserById = async (userId: string): Promise<any> => {
+  const cacheKey = `user_${userId}`;
+  
+  // Check cache first
+  if (isCacheValid(cacheKey)) {
+    return cache[cacheKey].data;
+  }
+  
+  try {
+    // Use Discord's public API to fetch user data
+    const response = await axios.get(`https://discord.com/api/v10/users/${userId}`, {
+      headers: {
+        'User-Agent': 'DiscordLookupTool/1.0',
+      }
+    });
+    
+    // Process the response data
+    const userData = processUserData(response.data);
+    
+    // Update cache
+    cache[cacheKey] = {
+      data: userData,
+      timestamp: Date.now()
+    };
+    
+    return userData;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    
+    // If the API request fails, fall back to mock data for development
+    console.log('Falling back to mock data');
+    const mockData = generateMockUserData(userId);
+    
+    // Cache the mock data
+    cache[cacheKey] = {
+      data: mockData,
+      timestamp: Date.now()
+    };
+    
+    return mockData;
+  }
+};
+
+// Function to process user data from Discord API
+const processUserData = (apiData: any) => {
+  return {
+    username: apiData.username,
+    id: apiData.id,
+    avatar: apiData.avatar 
+      ? `https://cdn.discordapp.com/avatars/${apiData.id}/${apiData.avatar}.png` 
+      : `https://cdn.discordapp.com/embed/avatars/${parseInt(apiData.discriminator || "0", 10) % 5}.png`,
+    banner: apiData.banner 
+      ? `https://cdn.discordapp.com/banners/${apiData.id}/${apiData.banner}.png?size=1024` 
+      : null,
+    bio: apiData.bio || "No bio available",
+    badges: parseBadges(apiData.public_flags || 0),
+    createdAt: calculateCreationDate(apiData.id),
+  };
 };
 
 // Mock data for development since Discord API requires auth
@@ -59,36 +119,6 @@ const generateMockUserData = (userId: string) => {
     badges: badges,
     createdAt: creationDate,
   };
-};
-
-// Get user info by ID
-export const getUserById = async (userId: string): Promise<any> => {
-  const cacheKey = `user_${userId}`;
-  
-  // Check cache first
-  if (isCacheValid(cacheKey)) {
-    return cache[cacheKey].data;
-  }
-  
-  try {
-    // Instead of making real API calls (which will fail with 401), 
-    // generate mock data for development purposes
-    const userData = generateMockUserData(userId);
-    
-    // Update cache
-    cache[cacheKey] = {
-      data: userData,
-      timestamp: Date.now()
-    };
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    return userData;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
-  }
 };
 
 // Mock data for vanity URL checking

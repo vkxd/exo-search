@@ -61,6 +61,9 @@ const Users = () => {
         <div className="mt-10 panel p-6 text-center max-w-lg animate-scale-in">
           <h3 className="text-xl font-semibold mb-2 text-red-400">Error</h3>
           <p className="text-gray-300">{error}</p>
+          <p className="text-sm text-gray-400 mt-4">
+            Note: The Discord public API may return 401 errors. If this happens, we'll show you mock data instead.
+          </p>
         </div>
       )}
       
@@ -78,7 +81,9 @@ const Users = () => {
       {!searchPerformed && !loading && !error && (
         <div className="mt-10 panel p-6 text-center max-w-lg animate-enter">
           <p className="text-gray-300">Enter a Discord user ID to view profile information, badges, and more.</p>
-          <p className="text-gray-400 text-sm mt-2">Example ID: 350984980767670272</p>
+          <p className="text-gray-400 text-sm mt-2">
+            This feature uses Discord's public API with a fallback to mock data if the API request fails.
+          </p>
         </div>
       )}
     </div>
